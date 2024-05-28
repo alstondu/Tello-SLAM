@@ -1,4 +1,4 @@
-<img src="https://github.com/alstondu/Tello-SLAM/blob/main/fig/drone-thin.png" width="100" />
+<img src="https://github.com/alstondu/Tello-SLAM/blob/main/fig/drone-thin.svg" width="100" />
 
 # Tello-SLAM
 Visual SLAM with DJI Tello
