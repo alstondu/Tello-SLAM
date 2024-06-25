@@ -81,41 +81,64 @@ roslaunch tello_driver joy_teleop.launch
 ```
 
 ## Tello Simulation in Gazebo
-Launch the system in terminal 1:
+### 1. Camera Calibration
+Launch the world with calibration board and tello:
 
 ```
-roslaunch tello_driver tello.launch
+roslaunch tello_driver cam_cal.launch
 ```
 
-### Keyboard Control(To Do: Joystick Control)
-Run teleop node in terminal 2:
+Run keyboard teleop node in terminal 2:
 
 ```
 rosrun keyboard_teleop keyboard_teleop_node.py _repeat_rate:=10.0
 ```
-
-### Save trajectory
-Before driving the drone, in terminal 3, record the predicted trajectory(```/orb_slam3_ros/camera_pose```) and the ground truth(```/ground_truth/state```) as rosbag:
+Run cam_calibration node:
 
 ```
-rosbag record /orb_slam3_ros/camera_pose /ground_truth/state
+rosrun cam_calibration cameracalibrator.py --size 7x7 --square 0.25 image:=/front_cam/camera/image camera:=/front_cam
 ```
+Drive the drone around the board until ```X, Y, Size, Skew``` all turn green. Click on the 'CALIBRATE' button, 'Save' the parameters and exit with 'COMMIT'.
 
-### EVO Evaluation
-Convert the saved rosbag to tum format:
+### 2. Monocular SLAM
+1. Launch the system in terminal 1:
 
-```
-evo_traj bag [bag_name] /orb_slam3_ros/camera_pose /ground_truth/state --save_as_tum
-```
+	```
+	roslaunch tello_driver tello.launch
+	```
 
-Change the suffix of the files from ```.tum``` to ```.txt```, plot the trajectories with(```-a``` for alignment, ```-as``` for alignment and scale):
+2.  Keyboard Control(To Do: Joystick Control)
 
-```
-evo_traj tum orb_slam3_ros_camera_pose.txt --ref ground_truth_state.txt -a -p --plot_mode=xyz
-```
-For APE(Absolute Pose Error), run:
+	Run teleop node in terminal 2:
 
-```
-evo_ape tum ground_truth_state.txt orb_slam3_ros_camera_pose.txt -vas -r full -p --plot_mode=xyz
-```
+	```
+	rosrun keyboard_teleop keyboard_teleop_node.py _repeat_rate:=10.0
+	```
+
+3.  Save trajectory
+
+	Before driving the drone, in terminal 3, record the predicted trajectory(```/orb_slam3_ros/camera_pose```) and the ground truth(```/ground_truth/state```) as rosbag:
+	
+	```
+	rosbag record /orb_slam3_ros/camera_pose /ground_truth/state
+	```
+
+4.  EVO Evaluation
+
+	Convert the saved rosbag to tum format:
+	
+	```
+	evo_traj bag [bag_name] /orb_slam3_ros/camera_pose /ground_truth/state --save_as_tum
+	```
+	
+	Change the suffix of the files from ```.tum``` to ```.txt```, plot the trajectories with(```-a``` for alignment, ```-as``` for alignment and scale):
+	
+	```
+	evo_traj tum orb_slam3_ros_camera_pose.txt --ref ground_truth_state.txt -a -p --plot_mode=xyz
+	```
+	For APE(Absolute Pose Error), run:
+	
+	```
+	evo_ape tum ground_truth_state.txt orb_slam3_ros_camera_pose.txt -vas -r full -p --plot_mode=xyz
+	```
 
